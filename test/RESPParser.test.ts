@@ -2,9 +2,9 @@ import RESPPArser from '../src/RESPParser';
 
 
 describe('RESPParser', () => {
-    let respParser;
+    let respParser: RESPPArser;
 
-    beforeAll(() => {
+    beforeEach(() => {
         respParser = new RESPPArser();
     });
 
@@ -34,9 +34,9 @@ describe('RESPParser', () => {
     });
 
     it('Should parse error message', () => {
-        const messages = respParser.parse('-Error message\r\n');
-        expect(messages[0]).toBeInstanceOf(Error);
-        expect(messages[0].message).toBe('Error message');
+        const [message] = respParser.parse('-Error message\r\n');
+        expect(message).toBeInstanceOf(Error);
+        expect((message as Error).message).toBe('Error message');
     });
 
     it('Should parse empty bulk string', () => {
@@ -48,4 +48,9 @@ describe('RESPParser', () => {
         const messages = respParser.parse('+hello world\r\n');
         expect(messages).toEqual(['hello world']);
     });
+
+    it('Should parse simple string with number', () => {
+        const messages = respParser.parse(':1\r\n');
+        expect(messages).toEqual([1]);
+    })
 })
