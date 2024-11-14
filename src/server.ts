@@ -10,18 +10,25 @@ const server = net.createServer((socket) => {
     socket.on('data', (data) => {
         const message = data.toString();
         console.log(`Message Received: ${message}`);
-
         const parser = new RESPParser();
         const serializer = new RESPSerializer();
         
-        const parsedMessage = parser.parse(message);
-        console.log(`Parsed Message is: ${parsedMessage}`);
-        
-        const response = parsedMessage[0] === 'PING' ? 'PONG' :  new Error('ERR unknown message');
-        const serializedResponse = serializer.serialize(response);
-        console.log(`Serialized Response is: ${serializedResponse}`);
-        
-        socket.write(serializedResponse);
+        try {    
+            const parsedMessage = parser.parse(message);
+            console.log(`Parsed Message is: ${parsedMessage}`);
+            
+            const response = parsedMessage[0] === 'PING' ? 'PONG' :  new Error('ERR unknown message');
+            const serializedResponse = serializer.serialize(response);
+            console.log(`Serialized Response is: ${serializedResponse}`);
+            
+            socket.write(serializedResponse);
+        } catch (error) {
+            console.log(`Error while processing data: ${error}`);
+
+            const errorMessage = serializer.serialize(new Error('Unknown Error'));
+            socket.write(errorMessage);
+
+        }
     });
 
     socket.on('end', () => console.log('Client Disconnected'));
