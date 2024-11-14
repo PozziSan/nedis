@@ -1,0 +1,1 @@
+export type RESPReturnType = string | number | null | Error | RESPReturnType[];

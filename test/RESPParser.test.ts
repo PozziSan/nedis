@@ -52,5 +52,38 @@ describe('RESPParser', () => {
     it('Should parse simple string with number', () => {
         const messages = respParser.parse(':1\r\n');
         expect(messages).toEqual([1]);
-    })
+    });
+
+    it('should parse a simple bulk string', () => {
+        const data = '$6\r\nfoobar\r\n';
+        const result = respParser.parse(data);
+        expect(result).toEqual(['foobar']);
+    });
+
+    it('should parse a bulk string with empty content', () => {
+        const data = '$0\r\n\r\n';
+        const result = respParser.parse(data);
+        expect(result).toEqual(['']);
+    });
+
+    it('should parse a null bulk string', () => {
+        const data = '$-1\r\n';
+        const result = respParser.parse(data);
+        expect(result).toEqual([null]);
+    });
+
+    it('should parse multiple bulk strings in sequence', () => {
+        const data = '$3\r\nfoo\r\n$3\r\nbar\r\n';
+        const result = respParser.parse(data);
+        expect(result).toEqual(['foo', 'bar']);
+    });
+
+    it('should handle incomplete bulk string and wait for more data', () => {
+        const data1 = '$6\r\nfo';
+        const data2 = 'obar\r\n';
+        let result = respParser.parse(data1);
+        expect(result).toEqual([]);
+        result = respParser.parse(data2);
+        expect(result).toEqual(['foobar']);
+    });
 })

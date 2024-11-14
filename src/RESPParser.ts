@@ -1,5 +1,4 @@
-type RESPReturnType = string | number | null | Error | RESPReturnType[];
-
+import type { RESPReturnType } from "./types";
 
 export default class RESPParser {
     private buffer: string;
