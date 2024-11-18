@@ -1,10 +1,17 @@
 import EchoCommand from '../../src/command/EchoCommand';
+import Memory from '../../src/Memory';
 import { RESPReturnType } from '../../src/types';
 
 describe('EchoCommand', () => {
+    let memory: Memory;
+
+    beforeAll(() => {
+        memory = new Memory();
+    });
+
     it('should return the input as output', () => {
         const input: RESPReturnType = 'Hello, World!';
-        const command = new EchoCommand(input);
+        const command = new EchoCommand(input, memory);
         const result = command.execute();
         expect(result).toBe(input);
     });
@@ -19,7 +26,7 @@ describe('EchoCommand', () => {
         ];
 
         inputs.forEach(input => {
-            const command = new EchoCommand(input);
+            const command = new EchoCommand(input, memory);
             const result = command.execute();
             expect(result).toBe(input);
         });

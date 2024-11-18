@@ -1,10 +1,17 @@
 import { commandFactory } from "./command/CommandFactory";
+import Memory from "./Memory";
 
 import type { RESPReturnType } from "./types";
 
 export default class Executor {
-    private static executeCommand(command: string, input: RESPReturnType) {
-        const commandObject = commandFactory(command, input);
+    private memory: Memory
+
+    public constructor(memory: Memory) {
+        this.memory = memory;
+    }
+
+    private executeCommand(command: string, input: RESPReturnType) {
+        const commandObject = commandFactory(command, input, this.memory);
         return commandObject.execute();
     }
 
@@ -20,7 +27,7 @@ export default class Executor {
         });
     }
     
-    public static execute(messages: RESPReturnType[]): RESPReturnType {
+    public execute(messages: RESPReturnType[]): RESPReturnType {
         const nedisMessage: RESPReturnType = messages[0];
         let command: string | undefined;
         let input: RESPReturnType;
@@ -36,7 +43,7 @@ export default class Executor {
         
         command = typeof nedisMessage[0] === 'string' ? nedisMessage[0] : undefined;
         if (command === undefined) return new Error('Command needs to be string');
-        if (!this.isValidInput(nedisMessage)) return new Error('Invalid input');
+        if (!Executor.isValidInput(nedisMessage)) return new Error('Invalid input');
 
         input = nedisMessage.slice(1);
         

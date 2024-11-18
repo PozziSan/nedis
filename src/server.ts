@@ -1,9 +1,12 @@
 import * as net from 'net';
+
+import Executor from './Executor';
+import Memory from './Memory';
 import RESPParser from './RESPParser';
 import RESPSerializer from './RESPSerializer';
-import Executor from './Executor';
 
 const PORT = 6379;
+const memory = new Memory();
 
 const server = net.createServer((socket) => {
     console.log("Client Connected!");
@@ -14,12 +17,13 @@ const server = net.createServer((socket) => {
         
         const parser = new RESPParser();
         const serializer = new RESPSerializer();
+        const executor = new Executor(memory);
         
         try {    
             const parsedMessages = parser.parse(message);
             console.log(`Parsed Message is: ${parsedMessages}`);
             
-            const response = Executor.execute(parsedMessages);
+            const response = executor.execute(parsedMessages);
             const serializedResponse = serializer.serialize(response);
             console.log(`Serialized Response is: ${serializedResponse}`);
             
